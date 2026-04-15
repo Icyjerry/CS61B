@@ -13,13 +13,11 @@ import java.awt.event.KeyEvent;
  *  @author P. N. Hilfinger
  */
 class GUI extends TopLevel {
-
     /** A new window with given TITLE providing a view of MODEL. */
     GUI(String title, Model model) {
         super(title, true);
         addMenuButton("Game->New", this::newGame);
         addMenuButton("Game->Quit", this::quit);
-
         addLabel("", "Score", new LayoutSpec("y", 1));
 
         _model = model;
