@@ -20,7 +20,7 @@ class GUI extends TopLevel {
         addMenuButton("Game->Quit", this::quit);
         addLabel("", "Score", new LayoutSpec("y", 1));
 
-        _model = ;
+        _model = model;
 
         _widget = new BoardWidget(model.size());
         add(_widget,
