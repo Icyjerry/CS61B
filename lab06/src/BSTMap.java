@@ -24,8 +24,6 @@ public class BSTMap<K extends Comparable<K>, V > implements Map61B<K, V> {
 
     @Override
     public void put(K key, V  value) {
-        int lastmove = 0;
-        Node<K, V> lastroot = root;
         if (this.size == 0){
             this.root = new Node<>(key, value);
             this.size = 1;
@@ -39,8 +37,6 @@ public class BSTMap<K extends Comparable<K>, V > implements Map61B<K, V> {
                         currentroot.left = new Node<>(key, value);
                         return;
                     }
-                    lastmove = 0; // 0 for left
-                    lastroot = currentroot;
                     currentroot = currentroot.left;
                 }
                 if (cmp > 0){
@@ -48,17 +44,11 @@ public class BSTMap<K extends Comparable<K>, V > implements Map61B<K, V> {
                         currentroot.right = new Node<>(key, value);
                         return;
                     }
-                    lastmove = 1; // 1 for right
-                    lastroot = currentroot;
                     currentroot = currentroot.right;
                 }
                 if (cmp == 0){
                     this.size--;
-                    if (lastmove == 0) {
-                        lastroot.left = new Node<>(key, value);
-                    } else {
-                        lastroot.right = new Node<>(key, value);
-                    }
+                    currentroot.value = value;
                     return;
                 }
             }
