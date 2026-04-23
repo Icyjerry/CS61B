@@ -39,6 +39,7 @@ public class Model {
         this.score = score;
     }
 
+
     /** Return the current Tile at (x, y), where 0 <= x < size(),
      *  0 <= y < size(). Returns null if there is no tile there.
      *  Used for testing. */
@@ -84,7 +85,13 @@ public class Model {
      *  Empty spaces are stored as null.
      * */
     public boolean emptySpaceExists() {
-        // TODO: Task 2. Fill in this function.
+        for (int y = 0; y < board.size(); y++) {
+            for (int x = 0; x < board.size(); x++) {
+                if (board.tile(x,y) == null){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -94,7 +101,13 @@ public class Model {
      * given a Tile object t, we get its value with t.value().
      */
     public boolean maxTileExists() {
-        // TODO: Task 3. Fill in this function.
+        for (int y = 0; y < board.size(); y++) {
+            for (int x = 0; x < board.size(); x++) {
+                if ((board.tile(x,y) != null) && (board.tile(x,y).value() == MAX_PIECE)){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -105,7 +118,20 @@ public class Model {
      * 2. There are two adjacent tiles with the same value.
      */
     public boolean atLeastOneMoveExists() {
-        // TODO: Fill in this function.
+        if (emptySpaceExists()){
+            return true;
+        } else {
+            for (int y = 0; y < board.size(); y++) {
+                for (int x = 0; x < board.size(); x++) {
+                    if (x < board.size() - 1 && board.tile(x,y).value() == board.tile(x + 1, y).value()) {
+                        return true;
+                    }
+                    if (y < board.size() - 1 && board.tile(x,y).value() == board.tile(x, y + 1).value() ){
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -124,11 +150,23 @@ public class Model {
      *    and the trailing tile does not.
      */
     public void moveTileUpAsFarAsPossible(int x, int y) {
-        Tile currTile = board.tile(x, y);
-        int myValue = currTile.value();
+        Tile t = board.tile(x, y);
+        if (t == null) return;
         int targetY = y;
-
-        // TODO: Tasks 5, 6, and 10. Fill in this function.
+        while (targetY + 1 < board.size() && board.tile(x, targetY +1) == null) {
+            targetY++;
+        }
+        if (targetY + 1 < board.size()) {
+            Tile target = board.tile(x, targetY + 1);
+            if (target.value() == t.value() && !target.wasMerged()) {
+                board.move(x, targetY + 1, t);
+                this.score += t.value() * 2;
+                return;
+            }
+        }
+        if (targetY > y) {
+            board.move(x, targetY, t);
+        }
     }
 
     /** Handles the movements of the tilt in column x of the board
@@ -137,11 +175,19 @@ public class Model {
      * so we are tilting the tiles in this column up.
      * */
     public void tiltColumn(int x) {
-        // TODO: Task 7. Fill in this function.
+        for (int y = board.size() - 1; y >= 0; y--) {
+            Tile tile = board.tile(x, y);
+            if (tile == null) continue;
+            moveTileUpAsFarAsPossible(x, y);
+        }
     }
 
     public void tilt(Side side) {
-        // TODO: Tasks 8 and 9. Fill in this function.
+        board.setViewingPerspective(side);
+        for (int x = 0; x < board.size(); x++) {
+            tiltColumn(x);
+        }
+        board.setViewingPerspective(Side.NORTH);
     }
 
     /** Tilts every column of the board toward SIDE.
