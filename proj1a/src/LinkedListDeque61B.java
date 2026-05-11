@@ -92,7 +92,6 @@ public class LinkedListDeque61B<T> implements Deque61B<T>{
             current = current.next;
         }
         return current.item;
-
     }
 
     @Override
