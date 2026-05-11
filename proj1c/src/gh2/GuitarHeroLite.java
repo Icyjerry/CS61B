@@ -3,58 +3,69 @@ package gh2;
 import edu.princeton.cs.algs4.StdAudio;
 import edu.princeton.cs.algs4.StdDraw;
 
-/**
- * A client that uses the synthesizer package to replicate a plucked guitar string sound
- */
 public class GuitarHeroLite {
-    private static final double CONCERT_A = 440.0;
-    private static final double CONCERT_C = CONCERT_A * Math.pow(2, 3.0 / 12.0);
-    private static final int WIDTH = 512;
-    private static final int HEIGHT = 512;
+    private static final String KEYS = "1234567";
+    private static final double[] FREQUENCIES = {
+            261.63,  // 1 - C4
+            293.66,  // 2 - D4
+            329.63,  // 3 - E4
+            349.23,  // 4 - F4
+            392.00,  // 5 - G4
+            440.00,  // 6 - A4
+            493.88   // 7 - B4
+    };
 
-    public static void main(String[] args) {
-        /* create two guitar strings, for concert A and C */
-        GuitarString stringA = new GuitarString(CONCERT_A);
-        GuitarString stringC = new GuitarString(CONCERT_C);
-        StdDraw.setCanvasSize(WIDTH, HEIGHT);
-        StdDraw.setXscale(0, WIDTH);
-        StdDraw.setYscale(0, HEIGHT);
+    private GuitarString[] strings;
+
+    public GuitarHeroLite() {
+        strings = new GuitarString[KEYS.length()];
+        for (int i = 0; i < KEYS.length(); i++) {
+            strings[i] = new GuitarString(FREQUENCIES[i]);
+        }
+    }
+
+    public void play() {
+        // 初始化画布
+        StdDraw.setCanvasSize(512, 512);
+        StdDraw.setXscale(0, 512);
+        StdDraw.setYscale(0, 512);
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.setPenRadius(0.05);
-        StdDraw.text(WIDTH / 2, (HEIGHT + 16) / 2, "Play the guitar!");
-        StdDraw.text(WIDTH / 2, (HEIGHT - 32) / 2, "Type A or C");
-        while (true) {
+        StdDraw.text(256, 300, "数字吉他");
+        StdDraw.text(256, 200, "按 1-7 演奏 Do-Re-Mi");
+        StdDraw.show();
 
-            /* check if the user has typed a key; if so, process it */
+        while (true) {
+            // 检测按键
             if (StdDraw.hasNextKeyTyped()) {
                 char key = StdDraw.nextKeyTyped();
-                if (key == 'a') {
+                int idx = KEYS.indexOf(key);
+                if (idx >= 0) {
+                    strings[idx].pluck();
+
+                    // 显示当前音符
                     StdDraw.clear();
-                    StdDraw.text(WIDTH / 2, HEIGHT / 2, "A");
-
+                    StdDraw.text(256, 300, "音符: " + (idx + 1));
+                    StdDraw.text(256, 200, KEYS.charAt(idx) + " = " + FREQUENCIES[idx] + " Hz");
                     StdDraw.show();
-                    stringA.pluck();
-
-                } else if (key == 'c') {
-                    StdDraw.clear();
-                    StdDraw.text(WIDTH / 2, HEIGHT / 2, "C");
-                    StdDraw.show();
-
-                    stringC.pluck();
                 }
             }
 
-            /* compute the superposition of samples */
-            double sample = stringA.sample() + stringC.sample();
-
-            /* play the sample on standard audio */
+            // 叠加所有弦的声音
+            double sample = 0;
+            for (GuitarString s : strings) {
+                sample += s.sample();
+            }
             StdAudio.play(sample);
 
-            /* advance the simulation of each guitar string by one step */
-            stringA.tic();
-            stringC.tic();
-
+            // 推进所有弦
+            for (GuitarString s : strings) {
+                s.tic();
+            }
         }
     }
-}
 
+    public static void main(String[] args) {
+        new GuitarHeroLite().play();
+    }
+}
